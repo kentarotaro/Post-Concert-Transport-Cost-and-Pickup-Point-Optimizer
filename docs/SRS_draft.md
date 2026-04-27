@@ -1,4 +1,5 @@
 # Dokumen Software Requirements Specification (SRS)
+
 **Proyek:** Post-Concert Transport Cost and Pickup Point Optimizer
 **Tim:** Request Menu Es Teh Panas
 **Tema:** Akomodasi & Mobilitas Penonton Konser di Jakarta
@@ -91,7 +92,7 @@ Tim terdiri dari lima mahasiswa Ilmu Komputer yang dibagi berdasarkan spesialisa
 | **Kemal** | Ketua Tim & DSAI | Arsitektur *pipeline* AI, *training* model XGBoost, pembuatan antarmuka Gradio, dan koordinasi teknis. |
 | **Aliya** | Backend Developer | Setup FastAPI, manajemen *routing* API, integrasi model dengan *server*, serta *deployment* ke Hugging Face. |
 | **Gilbard** | UI/UX Designer | Perancangan *wireframe* alur pengguna, panduan visual (warna/tipografi), desain *mockup* output, dan aset presentasi. |
-| **Jasmine** | Cyber Security | Validasi input, dokumentasi kebutuhan keamanan di SRS, audit keamanan API, dan validasi kebijakan CORS. |
+| **Jasmine** | Cyber Security | Validasi input, penulisan dokumen dan dokumentasi kebutuhan keamanan di SRS, audit keamanan API, dan validasi kebijakan CORS. |
 | **Musqat** | QA & Dokumentasi | Penulisan utama dokumen SRS, penyusunan skenario uji fungsional, pengujian *edge case*, dan penulisan README.md final. |
 
 
