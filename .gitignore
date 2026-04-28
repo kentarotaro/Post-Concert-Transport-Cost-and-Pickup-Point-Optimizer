@@ -1,0 +1,10 @@
+
+# Raw dataset besar
+data/raw/cab_prices/
+
+# Pycache
+**/__pycache__/
+*.pyc
+
+# Claude settings
+.claude/
