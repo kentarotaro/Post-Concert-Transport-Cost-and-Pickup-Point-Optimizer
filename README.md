@@ -14,7 +14,7 @@ pinned: false
 ![XGBoost](https://img.shields.io/badge/XGBoost-Regressor-orange?style=flat-square)
 ![Gradio](https://img.shields.io/badge/Gradio-Web%20UI-FF7F00?style=flat-square&logo=gradio)
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Spaces-yellow?style=flat-square&logo=huggingface)](https://huggingface.co/spaces/kentarotaro/gbk-transport-optimizer)
-[![Postman API Documentation](https://img.shields.io/badge/API-Postman-orange?style=for-the-badge&logo=postman)](https://documenter.getpostman.com/view/50299653/2sBXqJLgAj)
+[![Postman API Documentation](https://img.shields.io/badge/API-Postman-orange?style=flat-square&logo=postman)](https://documenter.getpostman.com/view/50299653/2sBXqJLgAj)
 
 
 ---
