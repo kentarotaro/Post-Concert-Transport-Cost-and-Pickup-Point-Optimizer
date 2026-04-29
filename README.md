@@ -134,7 +134,7 @@ Pastikan Python 3.10 atau versi lebih baru telah terpasang di sistem sebelum mem
 **1. Clone repositori**
 
 ```bash
-git clone https://github.com/username/gbk-transport-optimizer.git
+git clone https://github.com/kentarotaro/gbk-transport-optimizer.git
 cd gbk-transport-optimizer
 ```
 
