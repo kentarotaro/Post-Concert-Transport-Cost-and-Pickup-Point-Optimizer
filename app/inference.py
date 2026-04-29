@@ -1,4 +1,3 @@
-# app/inference.py
 import json
 import joblib
 import numpy as np
@@ -8,19 +7,18 @@ from pathlib import Path
 
 from app.schemas import PredictRequest, PredictResponse, TransportOption
 
-# ── Load artifacts sekali saat module di-import ──────────────────────────────
 BASE_DIR  = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
+DATA_DIR  = BASE_DIR / "data"
 
 encoder         = joblib.load(MODEL_DIR / "encoder.pkl")
 scaler          = joblib.load(MODEL_DIR / "scaler.pkl")
 model           = joblib.load(MODEL_DIR / "surge_predictor.pkl")
 feature_columns = json.loads((MODEL_DIR / "feature_columns.json").read_text())
+DESTINATIONS    = json.loads((DATA_DIR / "destinations.json").read_text(encoding="utf-8"))
 
-# ── Bangun Graf GBK dengan NetworkX ─────────────────────────────────────────
 G = nx.Graph()
 
-# Node: titik-titik di sekitar GBK
 nodes = [
     "Pintu_1_GBK",
     "Pintu_7_GBK",
@@ -30,7 +28,6 @@ nodes = [
 ]
 G.add_nodes_from(nodes)
 
-# Edge: koneksi antar titik dengan bobot jarak (meter)
 edges = [
     ("Pintu_1_GBK",      "Pintu_7_GBK",       260),
     ("Pintu_1_GBK",      "Bundaran_Senayan",   330),
@@ -42,7 +39,6 @@ edges = [
 for u, v, w in edges:
     G.add_edge(u, v, weight=w)
 
-# Koordinat node untuk heuristic A* (latitude, longitude)
 NODE_COORDS = {
     "Pintu_1_GBK":      (-6.2183, 106.8023),
     "Pintu_7_GBK":      (-6.2195, 106.7991),
@@ -52,25 +48,23 @@ NODE_COORDS = {
 }
 
 def heuristic(u, v):
-    """Euclidean heuristic berdasarkan koordinat (dalam derajat × 111000 meter)."""
     lat1, lon1 = NODE_COORDS[u]
     lat2, lon2 = NODE_COORDS[v]
     return ((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2) ** 0.5 * 111000
 
-# ── Konstanta Bisnis ─────────────────────────────────────────────────────────
-WALK_SPEED_MPS  = 1.2   # meter/detik
-OJOL_SPEED_KPH  = 25    # km/jam (kondisi macet pasca konser)
-TRANS_SPEED_KPH = 30    # km/jam (TransJakarta)
-VENUE_TO_DEST_KM = 8.0  # estimasi jarak venue ke tujuan akhir
+WALK_SPEED_MPS  = 1.2
+OJOL_SPEED_KPH  = 25
+TRANS_SPEED_KPH = 30
+DEFAULT_DEST_KM = 8.0
 
 OJOL_FLAG_FALL  = 9000
 OJOL_PER_KM     = 2500
 TRANS_FLAT_RATE = 3500
 
-# ── Fungsi Utama ─────────────────────────────────────────────────────────────
-def predict_transport(request: PredictRequest) -> PredictResponse:
 
-    # Step 1 — Siapkan feature row sesuai urutan training
+def predict_transport(request: PredictRequest) -> PredictResponse:
+    dest_km = DESTINATIONS.get(request.destination_zone, DEFAULT_DEST_KM)
+
     cat_input = pd.DataFrame([[
         request.day_type,
         request.concert_size,
@@ -78,13 +72,13 @@ def predict_transport(request: PredictRequest) -> PredictResponse:
     ]], columns=["day_type", "concert_size", "weather"])
     cat_encoded = encoder.transform(cat_input)
 
-    # Cari jarak walk dari current_location ke MRT_Istora via A*
     try:
         walk_to_mrt = nx.astar_path_length(
-            G, request.current_location, "MRT_Istora", heuristic=heuristic, weight="weight"
+            G, request.current_location, "MRT_Istora",
+            heuristic=heuristic, weight="weight"
         )
     except nx.NetworkXNoPath:
-        walk_to_mrt = 650  # fallback default
+        walk_to_mrt = 650
 
     num_input = pd.DataFrame([[
         request.concert_end_hour,
@@ -93,24 +87,19 @@ def predict_transport(request: PredictRequest) -> PredictResponse:
     ]], columns=["concert_end_hour", "time_since_end_minutes", "distance_to_pickup_meters"])
     num_scaled = scaler.transform(num_input)
 
-    # Gabungkan sesuai urutan feature_columns
     feature_array = np.hstack([num_scaled, cat_encoded])
 
-    # Step 2 — Prediksi surge
     surge = round(float(model.predict(feature_array)[0]), 2)
-    surge = max(1.0, min(surge, 3.5))  # clamp
+    surge = max(1.0, min(surge, 3.5))
 
-    # Step 3 — Hitung 3 opsi transportasi
-
-    # Opsi A: Ojol langsung dari current_location
     walk_a = 0 if request.current_location == "Pintu_1_GBK" else int(
         nx.astar_path_length(G, request.current_location, "Pintu_1_GBK",
                              heuristic=heuristic, weight="weight")
     )
-    cost_a  = int(OJOL_FLAG_FALL + (VENUE_TO_DEST_KM * OJOL_PER_KM * surge))
-    twalka  = round(walk_a / WALK_SPEED_MPS / 60, 1)
-    tridea  = round(VENUE_TO_DEST_KM / OJOL_SPEED_KPH * 60, 1)
-    time_a  = int(twalka + tridea)
+    cost_a = int(OJOL_FLAG_FALL + (dest_km * OJOL_PER_KM * surge))
+    twalka = round(walk_a / WALK_SPEED_MPS / 60, 1)
+    tridea = round(dest_km / OJOL_SPEED_KPH * 60, 1)
+    time_a = int(twalka + tridea)
 
     option_a = TransportOption(
         mode="ojol_langsung",
@@ -120,16 +109,15 @@ def predict_transport(request: PredictRequest) -> PredictResponse:
         estimated_time_minutes=time_a,
     )
 
-    # Opsi B: Jalan kaki ke Pintu 7, ojol dengan surge berkurang
-    walk_b      = int(nx.astar_path_length(
+    walk_b  = int(nx.astar_path_length(
         G, request.current_location, "Pintu_7_GBK",
         heuristic=heuristic, weight="weight"
     ))
-    surge_b     = round(max(surge - 0.4, 1.0), 2)
-    cost_b      = int(OJOL_FLAG_FALL + (VENUE_TO_DEST_KM * OJOL_PER_KM * surge_b))
-    twalkb      = round(walk_b / WALK_SPEED_MPS / 60, 1)
-    trideb      = round(VENUE_TO_DEST_KM / OJOL_SPEED_KPH * 60, 1)
-    time_b      = int(twalkb + trideb)
+    surge_b = round(max(surge - 0.4, 1.0), 2)
+    cost_b  = int(OJOL_FLAG_FALL + (dest_km * OJOL_PER_KM * surge_b))
+    twalkb  = round(walk_b / WALK_SPEED_MPS / 60, 1)
+    trideb  = round(dest_km / OJOL_SPEED_KPH * 60, 1)
+    time_b  = int(twalkb + trideb)
 
     option_b = TransportOption(
         mode="ojol_jalan_dulu",
@@ -139,11 +127,10 @@ def predict_transport(request: PredictRequest) -> PredictResponse:
         estimated_time_minutes=time_b,
     )
 
-    # Opsi C: TransJakarta dari MRT Istora (flat rate, tidak kena surge)
     walk_c  = int(walk_to_mrt)
     cost_c  = TRANS_FLAT_RATE
     twalkc  = round(walk_c / WALK_SPEED_MPS / 60, 1)
-    tridec  = round(VENUE_TO_DEST_KM / TRANS_SPEED_KPH * 60, 1)
+    tridec  = round(dest_km / TRANS_SPEED_KPH * 60, 1)
     time_c  = int(twalkc + tridec)
 
     option_c = TransportOption(
@@ -155,14 +142,12 @@ def predict_transport(request: PredictRequest) -> PredictResponse:
     )
 
     options = [option_a, option_b, option_c]
-
-    # Step 4 — Tentukan best option (biaya terendah)
     best    = min(options, key=lambda x: x.estimated_cost_idr)
     savings = cost_a - best.estimated_cost_idr
 
-    # Step 5 — Buat teks rekomendasi
     rec_text = (
         f"Surge saat ini {surge}x. "
+        f"Jarak ke {request.destination_zone}: {dest_km} km. "
         f"Rekomendasi terbaik: {best.mode.replace('_', ' ').title()} — "
         f"jalan kaki {best.walk_distance_meters}m ke {best.pickup_point}, "
         f"estimasi biaya Rp {best.estimated_cost_idr:,} "
