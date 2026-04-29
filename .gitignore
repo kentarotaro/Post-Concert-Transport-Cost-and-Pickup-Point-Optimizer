@@ -1,0 +1,159 @@
+# ══════════════════════════════════════════════════════════════════════
+# .gitignore — Post-Concert Transport Cost and Pickup Point Optimizer
+# Tim: Request Menu Es Teh Panas | OmahTI Internship 2025
+# ══════════════════════════════════════════════════════════════════════
+
+# ── 1. Python & Environment ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+
+# ── 2. Jupyter Notebooks ──────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_meta
+
+# ── 3. IDE & Editor ───────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.spyderproject
+.spyproject
+.ropeproject
+*.sublime-project
+*.sublime-workspace
+.claude/
+
+# ── 4. OS Generated ───────────────────────────────────────────────────
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ── 5. Machine Learning — File Besar yang Tidak Boleh Masuk ──────────
+# Raw dataset mentah dari sumber eksternal (cab_prices, weather, dll)
+data/raw/Cab_Prices/
+data/raw/*.csv
+data/raw/*.parquet
+data/raw/*.feather
+
+# Cache training XGBoost
+*.xgb.cache
+
+# Checkpoint model sementara (bukan final)
+models/checkpoints/
+models/tmp/
+models/*.tmp
+
+# Output evaluasi sementara
+outputs/
+runs/
+mlruns/
+wandb/
+
+# ── 6. Secrets & Credentials ──────────────────────────────────────────
+# JANGAN PERNAH commit file ini
+*.env
+.env.*
+secrets.json
+credentials.json
+service_account.json
+*.key
+*.pem
+*.p12
+*.pfx
+config/secrets/
+
+# ── 7. Gradio / HuggingFace ───────────────────────────────────────────
+flagged/
+gradio_cached_examples/
+.gradio/
+
+# ── 8. Testing & Coverage ─────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ── 9. Logs ───────────────────────────────────────────────────────────
+*.log
+logs/
+*.out
+
+# ── 10. Temporary Files ───────────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+*.orig
+
+# ══════════════════════════════════════════════════════════════════════
+# PENGECUALIAN WAJIB — File yang HARUS masuk ke repo
+# (override semua aturan di atas)
+# ══════════════════════════════════════════════════════════════════════
+
+# Dataset yang sudah diproses — wajib ada untuk reproducibility
+!data/processed/**/*.csv
+!data/processed/**/*.json
+!data/train/**/*.csv
+!data/val/**/*.csv
+!data/test/**/*.csv
+
+# Data statis venue (bukan dataset besar)
+!data/raw/astar_nodes_gbk.json
+!data/raw/venue_pickup_points.json
+!data/raw/generation_prompt.txt
+
+# Model artifacts — wajib ada untuk deployment
+!models/*.pkl
+!models/*.json
+
+# Requirements tetap di-track
+!requirements.txt
+
+# Mengabaikan dataset mentah yang ukurannya raksasa
+data/raw/
+*.csv
+*.txt

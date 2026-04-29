@@ -1,0 +1,8 @@
+[
+  "concert_end_hour",
+  "time_since_end_minutes",
+  "distance_to_pickup_meters",
+  "day_type",
+  "concert_size",
+  "weather"
+]

@@ -1,0 +1,27 @@
+{
+  "best_params": {
+    "learning_rate": 0.05,
+    "max_depth": 6,
+    "n_estimators": 500,
+    "subsample": 0.8
+  },
+  "test_metrics": {
+    "rmse": 0.1025,
+    "mae": 0.0791,
+    "r2": 0.9703
+  },
+  "surge_buckets": {
+    "low": {
+      "count": 3306,
+      "mean_abs_error": 0.0533
+    },
+    "medium": {
+      "count": 5298,
+      "mean_abs_error": 0.0834
+    },
+    "high": {
+      "count": 1580,
+      "mean_abs_error": 0.119
+    }
+  }
+}
