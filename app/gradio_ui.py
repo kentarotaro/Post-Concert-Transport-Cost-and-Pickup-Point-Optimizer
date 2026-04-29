@@ -69,7 +69,7 @@ def run_prediction(concert_end_hour, day_type, concert_size, weather,
 
         headers   = ["Moda Transportasi", "Titik Jemput", "Jalan Kaki",
                      "Estimasi Biaya", "Estimasi Waktu"]
-        table_data = [headers] + rows
+        table_data = rows
 
         rec_md = f"""
 ### Rekomendasi Terbaik
