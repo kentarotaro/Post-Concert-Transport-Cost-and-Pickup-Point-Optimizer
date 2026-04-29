@@ -13,7 +13,7 @@ pinned: false
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python)
 ![XGBoost](https://img.shields.io/badge/XGBoost-Regressor-orange?style=flat-square)
 ![Gradio](https://img.shields.io/badge/Gradio-Web%20UI-FF7F00?style=flat-square&logo=gradio)
-[![Try it live on Hugging Face](https://img.shields.io/badge/Try%20it%20Live-Hugging%20Face%20Spaces-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/kentarotaro/gbk-transport-optimizer)
+[![Hugging Face](https://img.shields.io/badge/Try%20it%20Live-Hugging%20Face%20Spaces-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/kentarotaro/gbk-transport-optimizer)
 
 
 ---
