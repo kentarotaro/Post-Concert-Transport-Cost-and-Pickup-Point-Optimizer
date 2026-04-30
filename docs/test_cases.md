@@ -1,6 +1,9 @@
+```markdown
 # Dokumen Skenario Pengujian (Test Cases)
 
 Dokumen ini berisi skenario pengujian untuk memastikan API berjalan dengan baik dan mengembalikan respons yang sesuai.
+
+---
 
 ## Test Case 01: Memeriksa Status Kesehatan API
 **Endpoint:** `/health`
@@ -9,13 +12,17 @@ Dokumen ini berisi skenario pengujian untuk memastikan API berjalan dengan baik 
 **Request:**
 ```bash
 curl --location '/health'
+```
 
 **Expected Response:**
-```bash
+```json
 {
   "status": "healthy",
   "model_loaded": true
 }
+```
+
+---
 
 ## Test Case 02: Meminta Rekomendasi Rute dan Prediksi Harga
 **Endpoint:** `/predict`
@@ -35,9 +42,10 @@ curl --location '/predict' \
   "destination_zone": "Jakarta Selatan",
   "current_location": "Pintu_1_GBK"
 }'
+```
 
 **Expected Response:**
-```bash
+```json
 {
   "surge_multiplier": 1.11,
   "best_option": "transjakarta",
